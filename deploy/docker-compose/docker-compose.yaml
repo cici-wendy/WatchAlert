@@ -2,7 +2,7 @@ version: "3"
 services:
   w8t-service:
     container_name: w8t-service
-    image: docker.io/cairry/watchalert:latest
+    image: wen-watchalert:v1.1
     environment:
       - TZ=Asia/Shanghai
     volumes:
@@ -24,13 +24,14 @@ services:
 
   w8t-web:
     container_name: w8t-web
-    image: docker.io/cairry/watchalert-web:latest
+    image: wen-watchalert-web:v1.1
     environment:
       - TZ=Asia/Shanghai
+      - REACT_APP_API_HOST=http://w8t-service:9001
     restart: always
     privileged: true
     ports:
-      - "80:80"
+      - "3000:3000"
     networks:
       - w8t
 
@@ -59,7 +60,7 @@ services:
       - ./mysql:/var/lib/mysql
     environment:
       - TZ=Asia/Shanghai
-      - MYSQL_ROOT_PASSWORD=w8t.123
+      - MYSQL_ROOT_PASSWORD=Watchalert962464
       - MYSQL_DATABASE=watchalert
     restart: always
     networks:
@@ -73,9 +74,9 @@ services:
       -  ../helmchart/files/sql:/sql
     environment:
       - TZ=Asia/Shanghai
-      - MYSQL_HOST=w8t-mysql
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=w8t.123
+      - MYSQL_HOST=rm-wz9ww267i81s679kioo.mysql.rds.aliyuncs.com
+      - MYSQL_USERNAME=watchalert
+      - MYSQL_PASSWORD=Watchalert962464
       - MYSQL_DATABASE=watchalert
     restart: on-failure
     command: ["sh", "-c", "chmod +x /sql/auto_import.sh; /sql/auto_import.sh"]
