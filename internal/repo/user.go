@@ -28,6 +28,7 @@ type (
 	}
 )
 
+
 func newUserInterface(db *gorm.DB, g InterGormDBCli) InterUserRepo {
 	return &UserRepo{
 		entryRepo{

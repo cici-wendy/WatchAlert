@@ -17,7 +17,7 @@ Database:
   path: data/w8t.db
 
 Redis:
-  host: w8t-redis
+  host: 127.0.0.1
   port: 6379
   pass: ""
   database: 0
@@ -25,3 +25,41 @@ Redis:
 Jwt:
   # 失效时间
   expire: 18000
+
+certificate: |
+  -----BEGIN CERTIFICATE-----
+  MIIE3TCCAsWgAwIBAgIDAeJAMA0GCSqGSIb3DQEBCwUAMCgxDjAMBgNVBAoTBWFk
+  bWluMRYwFAYDVQQDEw1jZXJ0LWJ1aWx0LWluMB4XDTI2MDQyODAzNDY0OFoXDTQ2
+  MDQyODAzNDY0OFowKDEOMAwGA1UEChMFYWRtaW4xFjAUBgNVBAMTDWNlcnQtYnVp
+  bHQtaW4wggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDnPd4pFc1BGk+n
+  gJe99Qy2dEgllLd2NIfmwXotId0SdfJ/wCPb+7UNQWJP4pMIZq1ISetb80LOa1pM
+  G0EtPpJKnGjN8K/jO49iU6mJlqm37pSFM/aOjCDL7vhZRHOoiLX2TFBVt0uCBVR5
+  q/yCji+Acr11/Y9P/AluEWJnyUm9e8p/TYdCokbAe+yfX2ULPqbs9Za2JbLf6fPW
+  XM/QtBbH2HQZtdxcWooQEXljGkdGhCSVqqXpl5GCE1oBA5lz+BIiSNwXRcKMs1cM
+  QyKkD3hF+uKyaIUpmwSw5ITLbGuSOP/EVJpStr2mrWQH0wMkORA2zrDysqXADKG7
+  kgwrEcIevur/4lkC1AQuMJ4MFAZd5fUcUHDBLdCnFL7hN4bzaJcaFVbC/ekvoFrh
+  ihIFLTYc/a6yOMxFbUjdkgPXIUHvxAyixPoAH+fxz8aBzhmQNEdH4JnONRDwZ1Bz
+  KhHCFOdolfgX7QwOKwaJf4CIk0l8TjmwXIZQoBI9AofzjBif8vGylYCeSSWAsLYd
+  PGAtr+uMEIT8BaHtz9AHCRLOMwFgoCWo7jo6PsOE5aOgw8HJGlTK7dEydiOr2yb4
+  DNNp8PN7G2GYEbPg5m4yXegRhxsM8HXTvP5RQbzRS1WLlmM0mAiXSIYixXGiO/md
+  FJkGn1bDtNRXwbAp5RsphOt+EKhUfwIDAQABoxAwDjAMBgNVHRMBAf8EAjAAMA0G
+  CSqGSIb3DQEBCwUAA4ICAQDgLMlCUU6DhEyQYAyle0Awgz/Bf7sIjatYmJ1rlCfX
+  ni+gFKZo5BFLcPlcSfmSdaUb2Q/CM2IZQXbOlPqTKpA9CM/VZE7lZow5P65ueVQu
+  d9F0OjbS0shab8+L6WcQarycLtjtE4iWGlKj312XRvCPXJw8FsVJ5AP9fGKGxMVe
+  E2mYTd9Ph7Cm7fGzMYD83Bcky+fEpv3bv4qENwwWL5XGMwz6yVhTs4f0Bmtom/zO
+  WAjB2Vucc3pGMpBLgtCKP/tdALxyCISJFsStQfMKHeQg+6qtpeXi/ZIKen13bpIo
+  ZcoKx7lY4ZjS5GpLpVDEkXyRWAGvNTpICtqWxvoV7/lfImGFolVNzUokpf3o8acl
+  U+xx+vvEfWlzCB9ve5gCVhKmwG1tPApNLRiqYCEkhzPmtr/FzDzgqi7ziNP8Rd0y
+  jDFiXcYjcHEMROKpE3A7flheTHQpRLmwIohD1YhdFx3lqx54Q60rl933hq+aEueN
+  anhHQH55pW/pl0rhLRCkPWeolAQQ+5FgDaKSeYsXDkacMTBS+nAcmpQUBe6GhVSE
+  aBnAnQ0n8f+ZqXks1fwtD7++yRwElxEg8u3nvo2LWrIPODCsIshI3eECqUNqyBKa
+  7D13kpM0Dsr9C7seGqtdOJdHm6FEHgWqUFKzuWzHBGmXnDYkJZUh75ft4xaPs/+c
+  qA==
+  -----END CERTIFICATE-----
+casdoorConfig:
+  endpoint: "http://8.163.43.154:8000"
+  client_id: "88c467ba60c16f41aed1"
+  client_secret: "5730c3142951582ba33d152c920b9fc2ea56d849"
+  organization: "built-in"
+  application_name: "watchAlert"
+  frontend_url: "http://localhost:3000"

@@ -18,6 +18,7 @@ import (
 	"watchAlert/internal/services"
 	"watchAlert/pkg/ai"
 
+	"github.com/casdoor/casdoor-go-sdk/casdoorsdk"
 	"github.com/gin-gonic/gin"
 	"github.com/zeromicro/go-zero/core/logc"
 	"golang.org/x/sync/errgroup"
@@ -28,7 +29,19 @@ var Version string
 func main() {
 	// 初始化配置
 	config.InitConfig(Version)
-	logc.Info(context.Background(), "服务启动")
+	logc.Info(context.Background(), "服务启动，端口: "+config.Application.Server.Port)
+
+	// 初始化 Casdoor
+	cfg := config.Application.CasdoorConfig
+	cert := config.Application.Certificate
+	casdoorsdk.InitConfig(
+		cfg.Endpoint,
+		cfg.ClientID,
+		cfg.ClientSecret,
+		cert,
+		cfg.Organization,
+		cfg.ApplicationName,
+	)
 
 	initBasic()
 
@@ -38,15 +51,46 @@ func main() {
 	}
 	gin.SetMode(mode)
 	ginEngine := gin.New()
+
+	// ===================== 安全跨域中间件 全局最优先 =====================
+	ginEngine.Use(func(c *gin.Context) {
+		origin := c.Request.Header.Get("Origin")
+		// 只允许自己前端域名，可自行增删
+		allowList := map[string]bool{
+			"http://localhost:3000":  true,
+			"http://127.0.0.1:3000":  true,
+			"http://localhost:3001":  true,
+			"http://127.0.0.1:3001":  true,
+		}
+
+		// 仅白名单域名赋予跨域头
+		if allowList[origin] {
+			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE")
+			c.Header("Access-Control-Allow-Headers", "Origin,Content-Type,Authorization,X-Requested-With,TenantID")
+			c.Header("Access-Control-Allow-Credentials", "true")
+		}
+
+		// 预检OPTIONS直接返回200
+		if c.Request.Method == http.MethodOptions {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+		c.Next()
+	})
+	// ===================================================================
+
+	// 其他全局中间件
 	ginEngine.Use(
-		// 启用CORS中间件
-		middleware.Cors(),
-		// 自定义请求日志格式
 		middleware.GinZapLogger(),
 		gin.Recovery(),
 		middleware.LoggingMiddleware(),
 	)
 
+	// 注册Casdoor路由
+	services.RegisterCasdoorGinRoutes(ginEngine)
+
+	// 注册业务路由
 	initRouter(ginEngine)
 
 	go func() {
@@ -65,23 +109,14 @@ func initRouter(engine *gin.Engine) {
 }
 
 func initBasic() {
-	// 初始化数据库和缓存
 	dbRepo := repo.NewRepoEntry()
 	rCache := cache.NewEntryCache()
-
-	// 创建上下文
 	ctx := ctx.NewContext(context.Background(), dbRepo, rCache)
 
-	// 初始化服务
 	services.NewServices(ctx)
-
-	// 启用告警评估携程
+	services.InitCasdoorService(ctx)
 	alert.Initialize(ctx)
-
-	// 导入数据源 Client 到存储池
 	importClientPools(ctx)
-
-	// 加载静默规则
 	go pushMuteRuleToRedis()
 
 	r, err := ctx.DB.Setting().Get()
@@ -113,7 +148,6 @@ func importClientPools(ctx *ctx.Context) {
 		logc.Error(ctx.Ctx, err.Error())
 		return
 	}
-
 	g := new(errgroup.Group)
 	for _, datasource := range list {
 		ds := datasource
@@ -140,25 +174,17 @@ func pushMuteRuleToRedis() {
 		logc.Errorf(ctx.Ctx, "获取静默规则列表失败, err: %s", err.Error())
 		return
 	}
-
 	if len(list) == 0 {
 		return
 	}
-
-	logc.Infof(ctx.Ctx, "获取到 %d 个静默规则", len(list))
-
 	var wg sync.WaitGroup
 	wg.Add(len(list))
 	for _, silence := range list {
 		go func(silence models.AlertSilences) {
-			defer func() {
-				wg.Done()
-			}()
-
+			defer wg.Done()
 			ctx.Redis.Silence().PushAlertMute(silence)
 		}(silence)
 	}
-
 	wg.Wait()
 	logc.Infof(ctx.Ctx, "所有静默规则加载完毕！")
 }
